@@ -72,3 +72,6 @@ def polygonArea(geojson_geometry):
 
   else:
     return 0
+
+def checkCoords(lon, lat):
+  return 180 > fabs(lon) > 0 and 180 > fabs(lat) > 0

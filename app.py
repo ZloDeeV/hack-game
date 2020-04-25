@@ -1,23 +1,50 @@
-from pymongo import MongoClient
-from geojson import importBuildings
-import settings
+from flask import Flask, request
+from bson.json_util import dumps
+from bson.objectid import ObjectId
+from db import getDB
+from flask_cors import CORS
 
-client = MongoClient(
-    'mongodb://{}@ds115198.mlab.com:15198/hack-game?retryWrites=false'.format(settings.DB_USER))
-db = client['hack-game']
+app = Flask('hack-game')
+CORS(app)
+db = getDB()
 
-def importGeo():
-  db.buildings.insert_many(importBuildings('export.geojson'))
+def testGame(props, value):
+  return not props
 
+@app.route('/')
+def hello_world():
+  return 'Hello, World!'
 
-def testGeo():
-  query = {
-    'loc': {
-      '$near': [32.049544, 54.780151],
-      '$maxDistance': 0.001
+@app.route('/walk', methods=['GET'])
+def walk():
+  lon = request.args.get('lon')
+  lat = request.args.get('lat')
+  try:
+    query = {
+      'loc': {
+        '$near': [float(lon), float(lat)],
+        '$maxDistance': 0.003
+      }
     }
-  }
-  for doc in db.buildings.find(query).limit(100):
-    print(doc)
+    buildings = db.buildings.find(query).limit(100)
+    return dumps(buildings)
+  except ValueError:
+    return 'Неверные координаты', 500
 
-testGeo()
+
+@app.route('/hack', methods=['GET', 'POST'])
+def hack():
+  obj_id = request.args.get('id')
+  query = { '_id': ObjectId(obj_id)}
+  building = db.buildings.find_one(query)
+  if request.method == 'GET':
+    return dumps(building)
+  else:
+    return testGame(building.get('game_properties'), request.args.get('value'))
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+  return 'Not found', 404
+
+app.run()

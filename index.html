@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test app</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+    integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+    crossorigin="" />
+
+  <style>
+    html, body {
+      height: 100%;
+    }
+    body {
+      width: 100%;
+      margin: 0;
+      padding: 2em;
+      display: flex;
+      font-family: "Courier New", Courier, monospace;
+      background-color: #1a1a1a;
+      box-sizing: border-box;
+    }
+    .application {
+      height: 100%;
+      flex: 1 0 auto;
+      margin: 0 1em;
+      padding: 3em;
+      border: 1px solid #50a14f;
+      box-sizing: border-box;
+    }
+    .bash {
+      max-width: 100%;
+      height: 100%;
+      color: #50a14f;
+      line-height: 1.1;
+      caret-color: transparent;
+    }
+    .bash__message::before {
+      content: '$'
+    }
+    .map {
+      font-size: 1em;
+      height: 100%;
+      flex: 1 0 auto;
+      margin: 0 1em;
+      padding: 3em;
+      border: 1px solid #50a14f;
+      box-sizing: border-box;
+    }
+    .map-icon {
+      font-size: 2em;
+      color: #50a14f;
+    }
+    .leaflet-container {
+      background: transparent;
+    }
+    .button {
+      padding: 1em;
+      border: 1px solid #50a14f;
+      color: #50a14f;
+      background: none;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="application">
+    <div class="bash">
+      <div class="bash__message" v-for="m in messages">
+        {{ m }}
+      </div>
+    </div>
+    <button class="button" @click="scan">Сканировать</button>
+    <!-- <ul>
+      <li v-for="building in buildings">{{ building.street }}, {{ building.housenumber }}</li>
+    </ul> -->
+  </div>
+  <div id="map" class="map"></div>
+  <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+    crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <script>
+    var mymap = L.map('map').setView([51.505, -0.09], 13);
+    var app = new Vue({
+      el: '#app',
+      data() {
+        return {
+          buildings: [],
+          messages: ['zlodeev: Йоу!']
+        }
+      },
+      methods: {
+        scan: function() {
+          model = this
+          navigator.geolocation.getCurrentPosition(function(pos) {
+            axios.get('http://127.0.0.1:5000/walk?lat=' + pos.coords.latitude + '&lon=' + pos.coords.longitude)
+              .then(function (response) {
+                mymap.setView([pos.coords.latitude, pos.coords.longitude], 16);
+                model.buildings = response.data;
+                model.messages = model.messages.concat(
+                  model.buildings.map(function(b) {
+                    return b.street
+                  })
+                );
+                model.buildings.forEach(function(b){
+                  L.marker([b.loc[1], b.loc[0]], {
+                    icon: new L.DivIcon({
+                      className: 'map-icon',
+                      html: '<span>⊛</span>'
+                    })
+                  }).addTo(mymap);
+                });
+              })
+              .catch(function (error) {
+                // handle error
+                console.log(error);
+              })
+              .then(function () {
+                // always executed
+              });
+          });
+        }
+      }
+    })
+  </script>
+</body>
+</html>
