@@ -1,0 +1,42 @@
+@import './vars.scss';
+
+
+input {
+  background-color: transparent;
+  border: none;
+  border: 2px solid $subbase-color;
+  caret-color: $text-color;
+  color: inherit;
+  font: inherit;
+  line-height: 1.2;
+  padding: 1em;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: $text-color;
+  }
+}
+
+.button {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 1em;
+  background-color: $text-color;
+  color: $base-color;
+  text-shadow: none;
+  cursor: pointer;
+  box-sizing: border-box;
+
+  &:hover {
+    box-shadow: 0 0 0 3px $base-color, 0 0 0 4px $text-color;
+  }
+
+  &--lined {
+    background-color: transparent;
+    color: $text-color;
+    text-shadow: $text-shadow;
+    border: 2px solid $text-color;
+  }
+
+}
