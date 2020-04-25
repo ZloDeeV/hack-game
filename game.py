@@ -7,4 +7,18 @@ def checkNumber(x):
                 return False
         return True   
     else:
-        return False        
+        return False
+
+def gameLow(original, testCase):
+	if (checkNumber(original)*checkNumber(testCase) == 1) and (len(original) == len(testCase)):
+		out = [0 for i in original]
+		for i in range(len(original)):
+			if original[i] == testCase[i]:
+				out[i] = 1
+			elif original.count(testCase[i]) > 0:
+				out[i] = 0
+			else:
+				out[i] = -1
+		return out			
+	else:
+		return ('Input incorrect.')
