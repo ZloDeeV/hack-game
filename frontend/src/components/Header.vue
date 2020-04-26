@@ -2,10 +2,10 @@
   <div class="header">
     <div class="header__nav">
       <router-link to="scanner" class="header__nav-item">>_scanner</router-link>
-      <router-link to="shop" class="header__nav-item">$_shop</router-link>
-      <router-link to="rating" class="header__nav-item">^_rating</router-link>
-      <router-link to="about" class="header__nav-item">@_about</router-link>
-      <div class="header__nav-item">logout_></div>
+      <div class="header__nav-item header__nav-item--disabled">$_shop</div>
+      <div class="header__nav-item header__nav-item--disabled">^_rating</div>
+      <div class="header__nav-item header__nav-item--disabled">@_about</div>
+      <div class="header__nav-item">%username%</div>
     </div>
   </div>
 </template>
@@ -41,6 +41,11 @@ export default {
     text-decoration: none;
     color: inherit;
     box-sizing: border-box;
+
+    &--disabled {
+      text-decoration: line-through;
+    }
+
     & + & {
       margin-left: 0.5em;
     }
